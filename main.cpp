@@ -22,6 +22,7 @@
 #include "City.hpp"
 #define MAX 71
 
+
 #ifdef NAN
 #endif
 #ifdef INFINITY

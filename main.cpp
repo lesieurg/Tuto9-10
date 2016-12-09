@@ -38,9 +38,7 @@ bool readFile(City tab[], string filename){
     
     cout << "Reading the file..." << endl;
     ifstream file(filename, ios::in);
-    if (file.is_open())
-    {
-        
+    if (file.is_open()){
         while (getline(file, fullString)){
             if (!firstLine){
                 string s = fullString;
@@ -103,6 +101,16 @@ bool readFile(City tab[], string filename){
     
 }
 
+// Fill the distance with 999999
+void fill_distance(City tab[], long double matrix[MAX][MAX]){
+    int i,j;
+    for(i=0; i<MAX; i++){
+        for (j=0; j<MAX; j++){
+            matrix[i][j] = 999999;
+        }
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 long double calculDistance(long double lat1, long double lon1, long double lat2, long double lon2){
@@ -127,14 +135,7 @@ void convert_in_graph(City tab[], long double matrix[MAX][MAX]){
     int numberCities=71;
     int dist;
     
-    // Fill the distance with INFINITY
-    for(i=0; i<numberCities; i++){
-        for (j=0; j<numberCities; j++)
-        {
-            matrix[i][j] = INFINITY;
-        }
-    }
-    
+    fill_distance(tab, matrix);
     for(i=0; i<numberCities; i++){
         for (j=0; j<numberCities; j++) {
             city1 = tab[i];
@@ -147,56 +148,18 @@ void convert_in_graph(City tab[], long double matrix[MAX][MAX]){
             cout << city1.name << " to " << city2.name << " : " << dist << endl;
         }
     }
-    
 }
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bool isFromExists(City tab[], string name){
-    int i,j;
-    City city1, city2;
-    int numberCities=71;
-    long double matrix[numberCities][numberCities];
+bool isCityExists(City tab[], string name){
+    int i,j=0;
+    City city2;
+    long double matrix[MAX][MAX];
     int dist;
     
-    for(i=0; i<numberCities; i++){
-        for (j=0; j<numberCities; j++){
-            matrix[i][j] = INFINITY;
-        }
-    }
-    
-    for(i=0; i<numberCities; i++){
-        city1 = tab[i];
+    fill_distance(tab, matrix);
+    for(j=0; j<MAX; j++){
         city2 = tab[j];
-        dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
-        if (i==j) dist= 0;
-        if (!name.compare(city1.name)){ // true
-            return true;
-        }
-    }
-    
-    return false;
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-bool isTooExists(City tab[], string name){
-    int i,j;
-    City city1, city2;
-    int numberCities=71;
-    long double matrix[numberCities][numberCities];
-    int dist;
-    
-    for(i=0; i<numberCities; i++){
-        for (j=0; j<numberCities; j++){
-            matrix[i][j] = INFINITY;
-        }
-    }
-    
-    for(i=0; i<numberCities; i++){
-        city1 = tab[i];
-        city2 = tab[j];
-        dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
         if (i==j) dist= 0;
         if (!name.compare(city2.name)){ // true
             return true;
@@ -205,41 +168,7 @@ bool isTooExists(City tab[], string name){
     return false;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-long double getDist(City tab[], string name){
-    int i,j;
-    City city1, city2;
-    int numberCities=71;
-    long double matrix[numberCities][numberCities];
-    
-    long double dist;
-    long double lat=0;
-    long double lon=0;
-    
-    // Fill the distance with INFINITY
-    for(i=0; i<numberCities; i++){
-        for (j=0; j<numberCities; j++){
-            matrix[i][j] = INFINITY;
-        }
-    }
-    
-    for (j=0; j<numberCities; j++) {
-        city1 = tab[i];
-        city2 = tab[j];
-        
-        if (i==j) dist= 0;
-        
-        if (!name.compare(city2.name)){ // true
-            lat = city2.lat;
-            lon = city2.lon;
-            dist = calculDistance(48.866692929999999,2.3333353259999998,lat,lon);
-            //cout << "lat = " << lat << "lon = " << lon << "dist" << dist<< endl;
-        }
-        
-    }
-    return dist;
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -247,23 +176,14 @@ long double getLat(City tab[], string name){
     int i,j;
     City city1, city2;
     int numberCities=71;
-    long double matrix[numberCities][numberCities];
+    long double matrix[MAX][MAX];
     int dist;
     long double lat=0;
     
-    // Fill the distance with INFINITY
-    for(i=0; i<numberCities; i++){
-        for (j=0; j<numberCities; j++){
-            matrix[i][j] = INFINITY;
-        }
-    }
-    
+    fill_distance(tab, matrix);
     for(i=0; i<numberCities; i++){
         for (j=0; j<numberCities; j++) {
-            city1 = tab[i];
             city2 = tab[j];
-            dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
-            
             if (i==j){
                 dist= 0;
             }
@@ -280,22 +200,14 @@ long double getLong(City tab[], string name){
     int i,j;
     City city1, city2;
     int numberCities=71;
-    long double matrix[numberCities][numberCities];
+    long double matrix[MAX][MAX];
     int dist;
     long double lon=0;
     
-    // Fill the distance with INFINITY
-    for(i=0; i<numberCities; i++){
-        for (j=0; j<numberCities; j++){
-            matrix[i][j] = INFINITY;
-        }
-    }
-    
-    for(i=0; i<numberCities; i++){
-        for (j=0; j<numberCities; j++) {
-            city1 = tab[i];
+    fill_distance(tab, matrix);
+    for(i=0; i<MAX; i++){
+        for (j=0; j<MAX; j++) {
             city2 = tab[j];
-            dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
             
             if (i==j){
                 dist= 0;
@@ -329,8 +241,8 @@ int dist(City tab[], string name){
     
     int dist = 0;
     
-    if (isTooExists(tab, name)){
-        dist = getDist(tab,name);
+    if (isCityExists(tab, name)){
+        //dist = getDist(tab,name);
     }
     else cout << "This city doesn't exist " << endl;
     
@@ -344,30 +256,25 @@ int dist(City tab[], string name){
 //Choisir une ville B et la suivante S(B)
 //Si le coût pour aller de A à B + S(A) à S(B) est inférieur au coût de A à S(A) + B à S(B), échanger ces solutions (faire ça pour tous les chemins possibles)
 
-int searchNumberByName(string cityName, City tabCity[])
-{
+int searchNumberByName(string cityName, City tab[]){
     int res=-1;
-    for (int i=0; i<MAX; i++)
-    {
-        if (cityName==tabCity[i].name)
-        {
+    for (int i=0; i<MAX; i++){
+        if (cityName==tab[i].name) {
             res = i;
         }
     }
     return res;
 }
 
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-long double sum(int tour[], long double cost[MAX][MAX])
-{
+long double sum(int lap[], long double matrix[MAX][MAX]){
     long double sum = 0;
     for (int i=0; i<MAX-1; i++)
     {
-        sum += cost[tour[i]][tour[i+1]];
+        sum += matrix[lap[i]][lap[i+1]];
     }
-    sum += cost[tour[MAX-1]][tour[0]];
+    sum += matrix[lap[MAX-1]][lap[0]];
     return sum;
 }
 
@@ -383,27 +290,22 @@ void twoOpt(City tab[], long double matrix[MAX][MAX], int city_numb){
         lap[i] = i;
     }
     
-    // On place la premiere ville en premiere place dans la liste tour
+    // On place la premiere ville en premiere place dans la liste lap
     lap[city_numb] = 0;
     lap[0] = city_numb;
     
     int bestDist;
-    while (cmpt<degOpti)
-    {
-        for (int i=1; i<MAX; i++)
-        {
-            for (int j=i; j<MAX; j++)
-            {
+    while (cmpt<degOpti){
+        for (int i=1; i<MAX; i++) {
+            for (int j=i; j<MAX; j++){
                 bestDist = sum(lap, matrix);
-                if ((i!=city_numb || j!=city_numb) && matrix[lap[i]][lap[j]]!=INFINITY)
-                {
+                if ((i!=city_numb || j!=city_numb) && matrix[lap[i]][lap[j]]!=INFINITY){
                     int temp = lap[i];
                     lap[i] = lap[j];
                     lap[j] = temp;
                 }
                 int newDist = sum(lap, matrix);
-                if (newDist>bestDist && newDist != INFINITY)
-                {
+                if (newDist>bestDist && newDist != INFINITY){
                     int temp = lap[i];
                     lap[i] = lap[j];
                     lap[j] = temp;
@@ -414,11 +316,11 @@ void twoOpt(City tab[], long double matrix[MAX][MAX], int city_numb){
     }
     long double sum=0;
     for (int i=0; i<MAX-1; i++){
-        cout << std::setprecision(17) << tab[lap[i]].name << " - " << tab[lap[i+1]].name << " => " << matrix[lap[i]][lap[i+1]] << endl;
+        cout << tab[lap[i]].name << " - " << tab[lap[i+1]].name << " => " << matrix[lap[i]][lap[i+1]] << endl;
         sum += matrix[lap[i]][lap[i+1]];
     }
     
-    cout << std::setprecision(17) << "Total distance = " << sum << endl;
+    cout << "the total distance is " << sum << endl;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -440,7 +342,7 @@ int main(int argc, const char * argv[]) {
     cout << "------------------------------" << endl;
     cout << "Test with MARSEILLE" << endl;
     cout << "latitude = " << getLat(cities, "MARSEILLE") << " longitude  = " <<  getLong(cities, "MARSEILLE") << endl;
-    cout << "distance from Paris = " << getDist(cities, "MARSEILLE") << endl;
+    //cout << "distance from Paris = " << getDist(cities, "MARSEILLE") << endl;
     
     string city_name;
     int city_int=- 1;
@@ -448,7 +350,7 @@ int main(int argc, const char * argv[]) {
     cout << "------------------------------" << endl;
     cout << "Enter a city name : " << endl;
     cin >> city_name;
-    if (isFromExists(cities, city_name)){
+    if (isCityExists(cities, city_name)){
         city_int = searchNumberByName(city_name, cities);
         if (city_int!=-1){
             cout << city_int <<  endl;

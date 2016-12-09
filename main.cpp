@@ -1,3 +1,4 @@
+
 //
 //  main.cpp
 //  Tuto9-10
@@ -17,7 +18,9 @@
 #include <stdlib.h>
 #include <iomanip>
 #include <cmath>
-#include "City.h"
+//#include "City.h" uncomment if there is an error
+#include "City.hpp"
+#define MAX 71
 
 #ifdef NAN
 #endif
@@ -25,49 +28,36 @@
 #endif
 using namespace std;
 
-//
-//typedef struct City
-//{
-//    string name;
-//    long double lon;
-//    long double lat;
-//} City;
-
-
-
-bool readFile(City tab[]){
+bool readFile(City tab[], string filename){
     string fullString;
     string name;
     string val1, val2;
     double lon, lat;
     bool firstLine = true;
     int i = 0;
-
+    
     cout << "Reading the file..." << endl;
-    ifstream file("Cites.csv", ios::in); // a changer chez vous pour tester
+    ifstream file(filename, ios::in);
     if (file.is_open())
     {
-
-        while (getline(file, fullString))
-        {
+        
+        while (getline(file, fullString)){
             if (!firstLine){
-                cout << "New line : " << fullString << endl;
-
                 string s = fullString;
                 string delimiter = ",";
-
+                
                 size_t pos = 0;
                 string token;
-
+                
                 // Get the name
                 pos = s.find(delimiter);
                 name = s.substr(0, pos);
                 s.erase(0, pos + delimiter.length());
-
+                
                 //Get the latitude
                 pos = s.find(delimiter);
                 val2 = s.substr(0, pos);
-
+                
                 stringstream myStream2(val2);// This code converts from string to number safely.
                 if (myStream2 >> lat){
                     lat = atof(val2.c_str());
@@ -77,48 +67,43 @@ bool readFile(City tab[]){
                     cout << "ERROR, INVALID DATA !" << endl;
                     return 1;
                 }
-
+                
                 //Get the longitude
                 pos = s.find(delimiter);
                 val1 = s.substr(0, pos);
-
+                
                 stringstream myStream(val1);// This code converts from string to number safely.
-                if (myStream >> lon)
-                {
+                if (myStream >> lon){
                     s.erase(0, pos + delimiter.length());
                 }
-                else
-                {
+                else{
                     cout << "ERROR, INVALID DATA !" << endl;
                     return false;
                 }
-
-                cout << std::setprecision(17) << "New data : " << name << " | " << lat << " | " << lon << endl;
+                
+                cout << std::setprecision(17) << name << " | " << lat << " | " << lon << endl;
                 cout << endl;
-
+                
                 City city;
                 city.lat = lat;
                 city.lon = lon;
                 city.name = name;
                 tab[i] = city;
-
+                
                 i++;
-
+                
             }
             firstLine = false;
         }
-        file.close();    }
+        file.close();
+    }
     else cout << "Unable to open file";
-
-
-
-
+    
     return true;
-
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 long double calculDistance(long double lat1, long double lon1, long double lat2, long double lon2){
     long double dist;
@@ -136,13 +121,12 @@ long double calculDistance(long double lat1, long double lon1, long double lat2,
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-void convert_in_graph(City tab[]){
+void convert_in_graph(City tab[], long double matrix[MAX][MAX]){
     int i,j;
     City city1, city2;
     int numberCities=71;
-    long double matrix[numberCities][numberCities];
     int dist;
-
+    
     // Fill the distance with INFINITY
     for(i=0; i<numberCities; i++){
         for (j=0; j<numberCities; j++)
@@ -150,57 +134,328 @@ void convert_in_graph(City tab[]){
             matrix[i][j] = INFINITY;
         }
     }
-
+    
     for(i=0; i<numberCities; i++){
-      for (j=0; j<numberCities; j++) {
-          city1 = tab[i];
-          city2 = tab[j];
-
-          if (i==j){
-              dist= 0;
-          }
-          else
-          {
-              dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
-          }
-          cout << city1.name << " to " << city2.name << " : " << dist << endl;
-          if (dist>100) matrix[i][j]=dist;
-      }
+        for (j=0; j<numberCities; j++) {
+            city1 = tab[i];
+            city2 = tab[j];
+            dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
+            
+            if (i==j){
+                dist= 0;
+            }
+            cout << city1.name << " to " << city2.name << " : " << dist << endl;
+        }
     }
-
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool isFromExists(City tab[], string name){
+    int i,j;
+    City city1, city2;
+    int numberCities=71;
+    long double matrix[numberCities][numberCities];
+    int dist;
+    
+    for(i=0; i<numberCities; i++){
+        for (j=0; j<numberCities; j++){
+            matrix[i][j] = INFINITY;
+        }
+    }
+    
+    for(i=0; i<numberCities; i++){
+        city1 = tab[i];
+        city2 = tab[j];
+        dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
+        if (i==j) dist= 0;
+        if (!name.compare(city1.name)){ // true
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+bool isTooExists(City tab[], string name){
+    int i,j;
+    City city1, city2;
+    int numberCities=71;
+    long double matrix[numberCities][numberCities];
+    int dist;
+    
+    for(i=0; i<numberCities; i++){
+        for (j=0; j<numberCities; j++){
+            matrix[i][j] = INFINITY;
+        }
+    }
+    
+    for(i=0; i<numberCities; i++){
+        city1 = tab[i];
+        city2 = tab[j];
+        dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
+        if (i==j) dist= 0;
+        if (!name.compare(city2.name)){ // true
+            return true;
+        }
+    }
+    return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+long double getDist(City tab[], string name){
+    int i,j;
+    City city1, city2;
+    int numberCities=71;
+    long double matrix[numberCities][numberCities];
+    
+    long double dist;
+    long double lat=0;
+    long double lon=0;
+    
+    // Fill the distance with INFINITY
+    for(i=0; i<numberCities; i++){
+        for (j=0; j<numberCities; j++){
+            matrix[i][j] = INFINITY;
+        }
+    }
+    
+    for (j=0; j<numberCities; j++) {
+        city1 = tab[i];
+        city2 = tab[j];
+        
+        if (i==j) dist= 0;
+        
+        if (!name.compare(city2.name)){ // true
+            lat = city2.lat;
+            lon = city2.lon;
+            dist = calculDistance(48.866692929999999,2.3333353259999998,lat,lon);
+            //cout << "lat = " << lat << "lon = " << lon << "dist" << dist<< endl;
+        }
+        
+    }
+    return dist;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+long double getLat(City tab[], string name){
+    int i,j;
+    City city1, city2;
+    int numberCities=71;
+    long double matrix[numberCities][numberCities];
+    int dist;
+    long double lat=0;
+    
+    // Fill the distance with INFINITY
+    for(i=0; i<numberCities; i++){
+        for (j=0; j<numberCities; j++){
+            matrix[i][j] = INFINITY;
+        }
+    }
+    
+    for(i=0; i<numberCities; i++){
+        for (j=0; j<numberCities; j++) {
+            city1 = tab[i];
+            city2 = tab[j];
+            dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
+            
+            if (i==j){
+                dist= 0;
+            }
+            if (!name.compare(city2.name)){ // true
+                lat = city2.lat;
+            }
+        }
+    }
+    return lat;
+}
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+long double getLong(City tab[], string name){
+    int i,j;
+    City city1, city2;
+    int numberCities=71;
+    long double matrix[numberCities][numberCities];
+    int dist;
+    long double lon=0;
+    
+    // Fill the distance with INFINITY
+    for(i=0; i<numberCities; i++){
+        for (j=0; j<numberCities; j++){
+            matrix[i][j] = INFINITY;
+        }
+    }
+    
+    for(i=0; i<numberCities; i++){
+        for (j=0; j<numberCities; j++) {
+            city1 = tab[i];
+            city2 = tab[j];
+            dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
+            
+            if (i==j){
+                dist= 0;
+            }
+            if (!name.compare(city2.name)){ // true
+                lon = city2.lon;
+            }
+        }
+    }
+    return lon;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+int get_lat(City city){
+    return city.lat;
+}
+
+int get_lon(City city){
+    return city.lon;
+}
+
+string get_name(City city){
+    return city.name;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+// return the distance for a city input
+int dist(City tab[], string name){
+    
+    int dist = 0;
+    
+    if (isTooExists(tab, name)){
+        dist = getDist(tab,name);
+    }
+    else cout << "This city doesn't exist " << endl;
+    
+    return dist;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //Lin-Kernighan heuristic
 //Choisir une ville A de départ et la suivante S(A)
 //Choisir une ville B et la suivante S(B)
 //Si le coût pour aller de A à B + S(A) à S(B) est inférieur au coût de A à S(A) + B à S(B), échanger ces solutions (faire ça pour tous les chemins possibles)
 
+int searchNumberByName(string cityName, City tabCity[])
+{
+    int res=-1;
+    for (int i=0; i<MAX; i++)
+    {
+        if (cityName==tabCity[i].name)
+        {
+            res = i;
+        }
+    }
+    return res;
+}
+
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+long double sum(int tour[], long double cost[MAX][MAX])
+{
+    long double sum = 0;
+    for (int i=0; i<MAX-1; i++)
+    {
+        sum += cost[tour[i]][tour[i+1]];
+    }
+    sum += cost[tour[MAX-1]][tour[0]];
+    return sum;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+void twoOpt(City tab[], long double matrix[MAX][MAX], int city_numb){
+    int lap[MAX];
+    int degOpti = 20;
+    int cmpt = 0;
+    int city = city_numb;
+    // Création d'un tour primaire
+    for (int i=0; i<MAX; i++){
+        lap[i] = i;
+    }
+    
+    // On place la premiere ville en premiere place dans la liste tour
+    lap[city_numb] = 0;
+    lap[0] = city_numb;
+    
+    int bestDist;
+    while (cmpt<degOpti)
+    {
+        for (int i=1; i<MAX; i++)
+        {
+            for (int j=i; j<MAX; j++)
+            {
+                bestDist = sum(lap, matrix);
+                if ((i!=city_numb || j!=city_numb) && matrix[lap[i]][lap[j]]!=INFINITY)
+                {
+                    int temp = lap[i];
+                    lap[i] = lap[j];
+                    lap[j] = temp;
+                }
+                int newDist = sum(lap, matrix);
+                if (newDist>bestDist && newDist != INFINITY)
+                {
+                    int temp = lap[i];
+                    lap[i] = lap[j];
+                    lap[j] = temp;
+                }
+            }
+        }
+        cmpt++;
+    }
+    long double sum=0;
+    for (int i=0; i<MAX-1; i++){
+        cout << std::setprecision(17) << tab[lap[i]].name << " - " << tab[lap[i+1]].name << " => " << matrix[lap[i]][lap[i+1]] << endl;
+        sum += matrix[lap[i]][lap[i+1]];
+    }
+    
+    cout << std::setprecision(17) << "Total distance = " << sum << endl;
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
 int main(int argc, const char * argv[]) {
     //on ouvre le fichier en lecture
-    ifstream fichier("Cites.csv", ios::in);
-    if(fichier){
-        if (fichier){
-            string ligne;
-            cout << "Lecture de fichier : "<< endl;
-            //while(getline(fichier, ligne)){
-                //cout << ligne << endl;  // on l'affiche
-            //}
-        }
-        City cities[71];
-        readFile(cities);
-        convert_in_graph(cities);
-        fichier.close();  // on ferme le fichier
+    string filename = "/Users/guillaumelesieur/Downloads/city.txt";
+    //string filename = ifstream("Cites.csv"); // a changer chez vous pour tester
+    
+    City cities[MAX];
+    long double matrix[MAX][MAX];
+    if (readFile(cities, filename)){
+        cout << "------------------------------" << endl;
+        convert_in_graph(cities,matrix);
     }
-    else
-        cout << "Impossible d'ouvrir le fichier !" << endl;
-
+    else cout << "ERROR " << endl;
+    
+    cout << "------------------------------" << endl;
+    cout << "Test with MARSEILLE" << endl;
+    cout << "latitude = " << getLat(cities, "MARSEILLE") << " longitude  = " <<  getLong(cities, "MARSEILLE") << endl;
+    cout << "distance from Paris = " << getDist(cities, "MARSEILLE") << endl;
+    
+    string city_name;
+    int city_int=- 1;
+    
+    cout << "------------------------------" << endl;
+    cout << "Enter a city name : " << endl;
+    cin >> city_name;
+    if (isFromExists(cities, city_name)){
+        city_int = searchNumberByName(city_name, cities);
+        if (city_int!=-1){
+            cout << city_int <<  endl;
+        }
+        twoOpt(cities, matrix, city_int);
+    }
+    else cout << "Invalid city name" << endl;
+    
     return 0;
 }
-
-
-

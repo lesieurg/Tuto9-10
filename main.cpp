@@ -155,13 +155,16 @@ void convert_in_graph(City tab[]){
       for (j=0; j<numberCities; j++) {
           city1 = tab[i];
           city2 = tab[j];
-          dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
 
           if (i==j){
               dist= 0;
           }
+          else
+          {
+              dist = calculDistance(city1.lat, city1.lon, city2.lat, city2.lon);
+          }
           cout << city1.name << " to " << city2.name << " : " << dist << endl;
-          //if (dist>100) matrix[i][j]=dist;
+          if (dist>100) matrix[i][j]=dist;
       }
     }
 
